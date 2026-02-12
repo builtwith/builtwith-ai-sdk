@@ -1,4 +1,4 @@
-# BuiltWith AI SDK
+# BuiltWith AI First SDK
 
 Official SDK for the [BuiltWith](https://builtwith.com) MCP API. Available for **Node.js** and **.NET**.
 
