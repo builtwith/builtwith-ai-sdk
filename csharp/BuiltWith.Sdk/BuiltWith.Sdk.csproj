@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net48;net8.0</TargetFrameworks>
+    <LangVersion>9.0</LangVersion>
+    <RootNamespace>BuiltWith.Sdk</RootNamespace>
+    <AssemblyName>BuiltWith.Sdk</AssemblyName>
+    <Version>1.0.0</Version>
+    <Description>BuiltWith AI-first SDK for .NET</Description>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+    <Reference Include="System.Net.Http" />
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />
+    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
+  </ItemGroup>
+</Project>
