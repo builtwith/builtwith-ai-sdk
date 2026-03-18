@@ -3,6 +3,13 @@
   "version": "1.0.0",
   "description": "BuiltWith AI-first SDK for Node.js",
   "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "files": [
+    "src/",
+    "README.md"
+  ],
   "scripts": {
     "test": "node test/test.js",
     "example": "node examples/examples.js"
@@ -10,5 +17,14 @@
   "engines": {
     "node": ">=22.0.0"
   },
+  "keywords": ["builtwith", "sdk", "technology-lookup", "ai", "mcp"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BuiltWith/builtwith-ai-sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/BuiltWith/builtwith-ai-sdk/issues"
+  },
+  "homepage": "https://github.com/BuiltWith/builtwith-ai-sdk#readme",
   "license": "MIT"
 }
