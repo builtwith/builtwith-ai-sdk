@@ -59,6 +59,7 @@ if (result.ok) {
 | `trust({ lookup })` | Root domain | Trust scoring |
 | `financial({ lookup })` | Root domain | Financial data |
 | `social({ lookup })` | Root domain | Social profile related domains |
+| `vector_search({ query, limit? })` | Search query | Semantic technology/category search |
 
 ### Response Format
 
@@ -124,6 +125,7 @@ All methods accept a `CancellationToken` as an optional last parameter.
 | `trust(lookup)` | `string` | Trust scoring |
 | `financial(lookup)` | `string` | Financial data |
 | `social(lookup)` | `string` | Social profile related domains |
+| `vector_search(query, limit?)` | `string`, `int?` | Semantic technology/category search |
 
 ### Response Format
 
