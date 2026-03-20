@@ -337,6 +337,14 @@ namespace BuiltWith.Sdk
             return RequestAsync("social-api", new { lookup }, ct);
         }
 
+        public Task<SdkResult> vector_search(string query, int? limit = null, CancellationToken ct = default)
+        {
+            ValidateString("query", query);
+            if (limit.HasValue)
+                return RequestAsync("vector-search", new { query, limit = limit.Value }, ct);
+            return RequestAsync("vector-search", new { query }, ct);
+        }
+
         // ── Prompt helpers ───────────────────────────────────────────────────
 
         public static object prompt_analyze_tech_stack(string domain)

@@ -322,6 +322,12 @@ class BuiltWithClient {
     return this._request('social-api', { lookup });
   }
 
+  async vector_search(params) {
+    const { query, limit } = params || {};
+    _validate_string('query', query);
+    return this._request('vector-search', { query, ...(limit != null ? { limit } : {}) });
+  }
+
   // ── Prompt helpers ─────────────────────────────────────────────────────────
 
   prompt_analyze_tech_stack(params) {
