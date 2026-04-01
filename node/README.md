@@ -60,6 +60,9 @@ if (result.ok) {
 | `financial({ lookup })` | Root domain | Financial data |
 | `social({ lookup })` | Root domain | Social profile related domains |
 | `vector_search({ query, limit? })` | Search query | Semantic technology/category search |
+| `payment_discovery()` | — | Agent Payment API: credit balance |
+| `payment_configuration()` | — | Agent Payment API: spending limits |
+| `payment_purchase({ credits })` | Integer ≥ 2000 | Agent Payment API: purchase credits |
 
 ### Response Format
 
@@ -126,6 +129,9 @@ All methods accept a `CancellationToken` as an optional last parameter.
 | `financial(lookup)` | `string` | Financial data |
 | `social(lookup)` | `string` | Social profile related domains |
 | `vector_search(query, limit?)` | `string`, `int?` | Semantic technology/category search |
+| `payment_discovery()` | — | Agent Payment API: credit balance |
+| `payment_configuration()` | — | Agent Payment API: spending limits |
+| `payment_purchase(credits)` | `int` ≥ 2000 | Agent Payment API: purchase credits |
 
 ### Response Format
 
@@ -144,6 +150,23 @@ result.Meta     // SdkMeta - request_id, tool, cached
 ```bash
 cd csharp/Examples
 BUILTWITH_API_KEY=your-key dotnet run
+```
+
+---
+
+## Agent Payment API
+
+The payment methods use a separate endpoint (`https://payments.builtwith.com`) and require an **Agent API Key** (different from your standard BuiltWith API key). Configure your key at [payments.builtwith.com/agent-payment-api-config](https://payments.builtwith.com/agent-payment-api-config).
+
+```js
+// Node.js
+const result = await client.payment_discovery();
+// result.data => { credits_total, credits_used, credits_available }
+```
+
+```csharp
+// C#
+var result = await client.payment_discovery();
 ```
 
 ---
