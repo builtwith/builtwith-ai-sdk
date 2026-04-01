@@ -14,7 +14,6 @@ namespace BuiltWith.Sdk
     public class BuiltWithClient : IDisposable
     {
         private const string DefaultEndpoint = "https://api.builtwith.com/mcp";
-        private const string DefaultPaymentsEndpoint = "https://payments.builtwith.com";
         private const int DefaultMaxRetries = 3;
         private const int InitialBackoffMs = 1000;
 
@@ -29,18 +28,16 @@ namespace BuiltWith.Sdk
         private readonly HttpClient _http;
         private readonly string _apiKey;
         private readonly string _endpoint;
-        private readonly string _paymentsEndpoint;
         private readonly int _maxRetries;
         private readonly bool _ownsHttpClient;
 
-        public BuiltWithClient(string apiKey, string endpoint = null, string paymentsEndpoint = null, int maxRetries = DefaultMaxRetries, HttpClient httpClient = null)
+        public BuiltWithClient(string apiKey, string endpoint = null, int maxRetries = DefaultMaxRetries, HttpClient httpClient = null)
         {
             if (string.IsNullOrEmpty(apiKey))
                 throw new ArgumentException("apiKey is required", nameof(apiKey));
 
             _apiKey = apiKey;
             _endpoint = endpoint ?? DefaultEndpoint;
-            _paymentsEndpoint = paymentsEndpoint ?? DefaultPaymentsEndpoint;
             _maxRetries = maxRetries;
 
             if (httpClient != null)
@@ -254,54 +251,6 @@ namespace BuiltWith.Sdk
             return Err(lastError ?? new BuiltWithException("UNKNOWN_ERROR", "Request failed", 0), mcpTool);
         }
 
-        // ── Payment API ──────────────────────────────────────────────────────
-
-        private async Task<SdkResult> PaymentRequestAsync(string method, string path, object body = null, CancellationToken ct = default)
-        {
-            var url = _paymentsEndpoint + path;
-            try
-            {
-                HttpResponseMessage response;
-                if (method == "GET")
-                {
-                    response = await _http.GetAsync(url, ct).ConfigureAwait(false);
-                }
-                else
-                {
-                    var json = body != null ? JsonSerializer.Serialize(body) : "{}";
-                    using var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
-                    response = await _http.PostAsync(url, content, ct).ConfigureAwait(false);
-                }
-
-                var status = (int)response.StatusCode;
-                var rawBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-
-                if (status == 400)
-                    return Err(new BuiltWithException("VALIDATION_ERROR", $"HTTP 400: {rawBody.Substring(0, Math.Min(200, rawBody.Length))}", status, "Check request parameters."), path);
-                if (status == 401 || status == 403)
-                    return Err(new BuiltWithException("AUTH_ERROR", "Authentication failed. Check your API key.", status, "Verify your BuiltWith API key is correct and active."), path);
-                if (status == 402)
-                    return Err(new BuiltWithException("PAYMENT_FAILED", $"HTTP 402: {rawBody.Substring(0, Math.Min(200, rawBody.Length))}", status, "Payment could not be processed. Check your billing details at payments.builtwith.com/agent-payment-api-config."), path);
-                if (status == 405)
-                    return Err(new BuiltWithException("METHOD_NOT_ALLOWED", "HTTP 405: wrong HTTP method.", status), path);
-                if (status >= 500)
-                    return Err(new BuiltWithException("SERVER_ERROR", $"HTTP {status}: {rawBody.Substring(0, Math.Min(200, rawBody.Length))}", status, "The server encountered an error. Try again later."), path);
-                if (status < 200 || status >= 300)
-                    return Err(new BuiltWithException("HTTP_ERROR", $"HTTP {status}: {rawBody.Substring(0, Math.Min(200, rawBody.Length))}", status), path);
-
-                JsonElement parsed;
-                try { parsed = JsonSerializer.Deserialize<JsonElement>(rawBody); }
-                catch { return Err(new BuiltWithException("PARSE_ERROR", "Failed to parse response JSON.", status), path); }
-
-                return Ok(parsed, parsed, path);
-            }
-            catch (TaskCanceledException) { throw; }
-            catch (Exception ex)
-            {
-                return Err(new BuiltWithException("NETWORK_ERROR", ex.Message, 0, "Check network connectivity."), path);
-            }
-        }
-
         // ── Public SDK methods ───────────────────────────────────────────────
 
         public Task<SdkResult> domain_lookup_live(string domain, bool liveOnly = true, CancellationToken ct = default)
@@ -398,19 +347,19 @@ namespace BuiltWith.Sdk
 
         public Task<SdkResult> payment_discovery(CancellationToken ct = default)
         {
-            return PaymentRequestAsync("GET", "/v1/billing/api-discovery", null, ct);
+            return RequestAsync("payment-balance", new { }, ct);
         }
 
         public Task<SdkResult> payment_configuration(CancellationToken ct = default)
         {
-            return PaymentRequestAsync("GET", "/v1/billing/api-configuration", null, ct);
+            return RequestAsync("payment-config", new { }, ct);
         }
 
         public Task<SdkResult> payment_purchase(int credits, CancellationToken ct = default)
         {
             if (credits < 2000)
                 throw new BuiltWithException("VALIDATION_ERROR", "credits must be at least 2000.", 0, "Minimum purchase is 2000 credits.");
-            return PaymentRequestAsync("POST", "/v1/billing/api-purchase", new { credits }, ct);
+            return RequestAsync("payment-purchase", new { credits }, ct);
         }
 
         // ── Prompt helpers ───────────────────────────────────────────────────

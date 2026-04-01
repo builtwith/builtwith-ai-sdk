@@ -301,40 +301,34 @@ async function run_tests() {
     'payment_purchase rejects credits < 2000'
   );
 
-  // Mock server for payment endpoints
-  const { server: pay_server, url: pay_url } = await create_mock_server((req, res) => {
-    const auth = req.headers['authorization'] || '';
-    if (!auth.startsWith('Bearer ') || auth === 'Bearer bad-key') {
-      res.writeHead(401, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: 'unauthorized' }));
-      return;
-    }
-    if (req.url === '/v1/billing/api-discovery' && req.method === 'GET') {
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ credits_total: 10000, credits_used: 500, credits_available: 9500 }));
-    } else if (req.url === '/v1/billing/api-configuration' && req.method === 'GET') {
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ max_per_purchase: 10000, max_monthly: 50000, monthly_purchased: 2000, monthly_remaining: 48000, cost_per_2000_credits_usd: 1.00 }));
-    } else if (req.url === '/v1/billing/api-purchase' && req.method === 'POST') {
-      const chunks = [];
-      req.on('data', c => chunks.push(c));
-      req.on('end', () => {
-        const body = JSON.parse(Buffer.concat(chunks).toString('utf-8'));
-        if (body.credits < 2000) {
-          res.writeHead(400, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ error: 'below minimum' }));
-        } else {
-          res.writeHead(200, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ success: true, credits_purchased: body.credits, cost_usd: body.credits / 2000, payment_id: 'pay_test_123', credits_available: 9500 + body.credits }));
-        }
-      });
-    } else {
-      res.writeHead(404);
-      res.end('{}');
-    }
+  // Mock MCP server for payment tools
+  const mcp_response = (tool, data) => JSON.stringify({
+    jsonrpc: '2.0',
+    result: { content: [{ type: 'text', text: JSON.stringify(data) }] },
+    id: '1',
   });
 
-  const pay_client = new BuiltWithClient('test-key', { payments_endpoint: pay_url });
+  const { server: pay_server, url: pay_url } = await create_mock_server((req, res) => {
+    const chunks = [];
+    req.on('data', c => chunks.push(c));
+    req.on('end', () => {
+      const body = JSON.parse(Buffer.concat(chunks).toString('utf-8'));
+      const tool = body.params && body.params.name;
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      if (tool === 'payment-balance') {
+        res.end(mcp_response(tool, { credits_total: 10000, credits_used: 500, credits_available: 9500 }));
+      } else if (tool === 'payment-config') {
+        res.end(mcp_response(tool, { max_per_purchase: 10000, max_monthly: 50000, monthly_purchased: 2000, monthly_remaining: 48000, cost_per_2000_credits_usd: 1.00 }));
+      } else if (tool === 'payment-purchase') {
+        const credits = body.params.arguments.credits;
+        res.end(mcp_response(tool, { success: true, credits_purchased: credits, cost_usd: credits / 2000, payment_id: 'pay_test_123', credits_available: 9500 + credits }));
+      } else {
+        res.end(JSON.stringify({ jsonrpc: '2.0', error: { message: 'unknown tool' }, id: '1' }));
+      }
+    });
+  });
+
+  const pay_client = new BuiltWithClient('test-key', { endpoint: pay_url });
 
   // Happy path: discovery
   const disc = await pay_client.payment_discovery();
@@ -351,12 +345,6 @@ async function run_tests() {
   assert(purch.ok === true, 'payment_purchase returns ok');
   assert(purch.data.success === true, 'payment_purchase data.success is true');
   assert(purch.data.payment_id === 'pay_test_123', 'payment_purchase returns payment_id');
-
-  // Auth error: 401
-  const bad_client = new BuiltWithClient('bad-key', { payments_endpoint: pay_url });
-  const auth_err = await bad_client.payment_discovery();
-  assert(auth_err.ok === false, 'payment_discovery returns ok=false on 401');
-  assert(auth_err.error.error_code === 'AUTH_ERROR', 'payment_discovery maps 401 to AUTH_ERROR');
 
   pay_server.close();
 

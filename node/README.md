@@ -156,7 +156,7 @@ BUILTWITH_API_KEY=your-key dotnet run
 
 ## Agent Payment API
 
-The payment methods use a separate endpoint (`https://payments.builtwith.com`) and require an **Agent API Key** (different from your standard BuiltWith API key). Configure your key at [payments.builtwith.com/agent-payment-api-config](https://payments.builtwith.com/agent-payment-api-config).
+The payment methods let AI agents check credit balances, view spending configuration, and purchase credits. They route through the standard MCP endpoint using your existing API key. Configure billing at [payments.builtwith.com/agent-payment-api-config](https://payments.builtwith.com/agent-payment-api-config).
 
 ```js
 // Node.js

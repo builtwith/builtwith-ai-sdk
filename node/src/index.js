@@ -7,7 +7,6 @@ const { URL } = require('url');
 // ── Constants ──────────────────────────────────────────────────────────────────
 
 const MCP_ENDPOINT = 'https://api.builtwith.com/mcp';
-const PAYMENTS_ENDPOINT = 'https://payments.builtwith.com';
 const MAX_RETRIES = 3;
 const INITIAL_BACKOFF_MS = 1000;
 const DOMAIN_RE = /^(?!-)[a-zA-Z0-9-]{1,63}(?<!-)(\.[a-zA-Z]{2,})+$/;
@@ -134,37 +133,6 @@ function _http_post(url_str, body, headers, timeout_ms) {
   });
 }
 
-function _http_get(url_str, headers, timeout_ms) {
-  return new Promise((resolve, reject) => {
-    const parsed = new URL(url_str);
-    const transport = parsed.protocol === 'http:' ? http : https;
-    const opts = {
-      hostname: parsed.hostname,
-      port: parsed.port || (parsed.protocol === 'http:' ? 80 : 443),
-      path: parsed.pathname + parsed.search,
-      method: 'GET',
-      headers: {
-        ...headers,
-        'Accept': 'application/json',
-      },
-      timeout: timeout_ms,
-    };
-
-    const req = transport.request(opts, (res) => {
-      const chunks = [];
-      res.on('data', chunk => chunks.push(chunk));
-      res.on('end', () => {
-        const raw_body = Buffer.concat(chunks).toString('utf-8');
-        resolve({ status: res.statusCode, headers: res.headers, body: raw_body });
-      });
-    });
-
-    req.on('error', reject);
-    req.on('timeout', () => { req.destroy(); reject(new Error('Request timed out')); });
-    req.end();
-  });
-}
-
 // ── Client ─────────────────────────────────────────────────────────────────────
 
 class BuiltWithClient {
@@ -174,7 +142,6 @@ class BuiltWithClient {
     }
     this._api_key = api_key;
     this._endpoint = options.endpoint || MCP_ENDPOINT;
-    this._payments_endpoint = options.payments_endpoint || PAYMENTS_ENDPOINT;
     this._max_retries = options.max_retries != null ? options.max_retries : MAX_RETRIES;
     this._timeout_ms = options.timeout_ms || 30000;
   }
@@ -271,38 +238,6 @@ class BuiltWithClient {
     return _err(last_error || new BuiltWithError('UNKNOWN_ERROR', 'Request failed', 0), mcp_tool);
   }
 
-  // ── Payment API ────────────────────────────────────────────────────────────
-
-  async _payment_request(method, path, body = null) {
-    const url = this._payments_endpoint + path;
-    const headers = { Authorization: `Bearer ${this._api_key}` };
-    try {
-      const res = method === 'GET'
-        ? await _http_get(url, headers, this._timeout_ms)
-        : await _http_post(url, body, headers, this._timeout_ms);
-
-      const status = res.status;
-
-      if (status === 400) return _err(new BuiltWithError('VALIDATION_ERROR', `HTTP 400: ${res.body.substring(0, 200)}`, status, null, 'Check request parameters.'), path);
-      if (status === 401 || status === 403) return _err(new BuiltWithError('AUTH_ERROR', 'Authentication failed. Check your API key.', status, null, 'Verify your BuiltWith API key is correct and active.'), path);
-      if (status === 402) return _err(new BuiltWithError('PAYMENT_FAILED', `HTTP 402: ${res.body.substring(0, 200)}`, status, null, 'Payment could not be processed. Check your billing details at payments.builtwith.com/agent-payment-api-config.'), path);
-      if (status === 405) return _err(new BuiltWithError('METHOD_NOT_ALLOWED', `HTTP 405: wrong HTTP method.`, status), path);
-      if (status >= 500) return _err(new BuiltWithError('SERVER_ERROR', `HTTP ${status}: ${res.body.substring(0, 200)}`, status, null, 'The server encountered an error. Try again later.'), path);
-      if (status < 200 || status >= 300) return _err(new BuiltWithError('HTTP_ERROR', `HTTP ${status}: ${res.body.substring(0, 200)}`, status), path);
-
-      let parsed;
-      try {
-        parsed = JSON.parse(res.body);
-      } catch (_) {
-        return _err(new BuiltWithError('PARSE_ERROR', 'Failed to parse response JSON.', status), path);
-      }
-
-      return _ok(parsed, parsed, path);
-    } catch (err) {
-      return _err(new BuiltWithError('NETWORK_ERROR', err.message, 0, null, 'Check network connectivity.'), path);
-    }
-  }
-
   // ── Public SDK methods ─────────────────────────────────────────────────────
 
   async domain_lookup_live(params) {
@@ -396,11 +331,11 @@ class BuiltWithClient {
   }
 
   async payment_discovery() {
-    return this._payment_request('GET', '/v1/billing/api-discovery');
+    return this._request('payment-balance', {});
   }
 
   async payment_configuration() {
-    return this._payment_request('GET', '/v1/billing/api-configuration');
+    return this._request('payment-config', {});
   }
 
   async payment_purchase(params) {
@@ -414,7 +349,7 @@ class BuiltWithClient {
     if (credits < 2000) {
       throw new BuiltWithError('VALIDATION_ERROR', 'credits must be at least 2000.', 0, null, 'Minimum purchase is 2000 credits.');
     }
-    return this._payment_request('POST', '/v1/billing/api-purchase', { credits });
+    return this._request('payment-purchase', { credits });
   }
 
   // ── Prompt helpers ─────────────────────────────────────────────────────────
