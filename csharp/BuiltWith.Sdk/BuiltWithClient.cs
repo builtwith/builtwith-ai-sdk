@@ -345,6 +345,18 @@ namespace BuiltWith.Sdk
             return RequestAsync("vector-search", new { query }, ct);
         }
 
+        public Task<SdkResult> keyword_search(string keyword, int? limit = null, string? offset = null, CancellationToken ct = default)
+        {
+            ValidateString("keyword", keyword);
+            if (limit.HasValue && !string.IsNullOrEmpty(offset))
+                return RequestAsync("keyword-search-api", new { keyword, limit = limit.Value, offset }, ct);
+            if (limit.HasValue)
+                return RequestAsync("keyword-search-api", new { keyword, limit = limit.Value }, ct);
+            if (!string.IsNullOrEmpty(offset))
+                return RequestAsync("keyword-search-api", new { keyword, offset }, ct);
+            return RequestAsync("keyword-search-api", new { keyword }, ct);
+        }
+
         public Task<SdkResult> payment_discovery(CancellationToken ct = default)
         {
             return RequestAsync("payment-balance", new { }, ct);

@@ -330,6 +330,16 @@ class BuiltWithClient {
     return this._request('vector-search', { query, ...(limit != null ? { limit } : {}) });
   }
 
+  async keyword_search(params) {
+    const { keyword, limit, offset } = params || {};
+    _validate_string('keyword', keyword);
+    return this._request('keyword-search-api', {
+      keyword,
+      ...(limit != null ? { limit } : {}),
+      ...(offset != null ? { offset } : {}),
+    });
+  }
+
   async payment_discovery() {
     return this._request('payment-balance', {});
   }
