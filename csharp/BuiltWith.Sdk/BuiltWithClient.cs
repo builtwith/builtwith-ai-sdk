@@ -405,5 +405,76 @@ namespace BuiltWith.Sdk
             ValidateDomain(domain);
             return new { mcp_prompt = "check-domain-trust", arguments = new { domain } };
         }
+
+        // ── Agent Device-Code Authorization (no API key required) ────────────
+
+        /// <summary>
+        /// Start the Agent Device-Code Authorization flow. No API key required.
+        /// Returns device_code and verification_uri. Direct the user to open the URI in their browser,
+        /// then poll agent_auth_token every 5 seconds until approved or denied.
+        /// </summary>
+        public static async Task<SdkResult> agent_auth_start(HttpClient httpClient = null, CancellationToken ct = default)
+        {
+            bool ownsClient = httpClient == null;
+            httpClient ??= new HttpClient();
+            try
+            {
+                using var content = new StringContent("{}", System.Text.Encoding.UTF8, "application/json");
+                using var response = await httpClient.PostAsync("https://api.builtwith.com/agent-auth/start", content, ct).ConfigureAwait(false);
+                var body = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                var status = (int)response.StatusCode;
+                if (status < 200 || status >= 300)
+                    return Err(new SdkError { ErrorCode = "HTTP_ERROR", Message = $"HTTP {status}", HttpStatus = status }, "agent-auth-start");
+                object data;
+                try { data = JsonSerializer.Deserialize<JsonElement>(body); }
+                catch { return Err(new SdkError { ErrorCode = "PARSE_ERROR", Message = "Failed to parse agent-auth-start response.", HttpStatus = status }, "agent-auth-start"); }
+                return Ok(data, default, "agent-auth-start", null);
+            }
+            catch (TaskCanceledException) { throw; }
+            catch (Exception ex)
+            {
+                return Err(new SdkError { ErrorCode = "NETWORK_ERROR", Message = ex.Message, HttpStatus = 0 }, "agent-auth-start");
+            }
+            finally
+            {
+                if (ownsClient) httpClient.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// Poll for the result of an Agent Device-Code Authorization flow. No API key required.
+        /// Call every 5 seconds after agent_auth_start. On approval, data.access_token contains the bw-... token.
+        /// </summary>
+        public static async Task<SdkResult> agent_auth_token(string deviceCode, HttpClient httpClient = null, CancellationToken ct = default)
+        {
+            if (string.IsNullOrEmpty(deviceCode))
+                throw new BuiltWithException("VALIDATION_ERROR", "deviceCode is required and must be a non-empty string.", 0, "Provide the device_code from agent_auth_start.");
+
+            bool ownsClient = httpClient == null;
+            httpClient ??= new HttpClient();
+            try
+            {
+                var bodyJson = JsonSerializer.Serialize(new { device_code = deviceCode });
+                using var content = new StringContent(bodyJson, System.Text.Encoding.UTF8, "application/json");
+                using var response = await httpClient.PostAsync("https://api.builtwith.com/agent-auth/token", content, ct).ConfigureAwait(false);
+                var body = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                var status = (int)response.StatusCode;
+                if (status < 200 || status >= 300)
+                    return Err(new SdkError { ErrorCode = "HTTP_ERROR", Message = $"HTTP {status}", HttpStatus = status }, "agent-auth-token");
+                object data;
+                try { data = JsonSerializer.Deserialize<JsonElement>(body); }
+                catch { return Err(new SdkError { ErrorCode = "PARSE_ERROR", Message = "Failed to parse agent-auth-token response.", HttpStatus = status }, "agent-auth-token"); }
+                return Ok(data, default, "agent-auth-token", null);
+            }
+            catch (TaskCanceledException) { throw; }
+            catch (Exception ex)
+            {
+                return Err(new SdkError { ErrorCode = "NETWORK_ERROR", Message = ex.Message, HttpStatus = 0 }, "agent-auth-token");
+            }
+            finally
+            {
+                if (ownsClient) httpClient.Dispose();
+            }
+        }
     }
 }
