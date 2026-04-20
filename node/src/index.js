@@ -398,7 +398,7 @@ class BuiltWithClient {
 
   static async agent_auth_start() {
     try {
-      const res = await _http_post('https://api.builtwith.com/agent-auth/start', {}, {}, 30000);
+      const res = await _http_post('https://api.builtwith.com/agent-auth-start', {}, {}, 30000);
       if (res.status < 200 || res.status >= 300) {
         return _err(new BuiltWithError('HTTP_ERROR', `HTTP ${res.status}: ${res.body.substring(0, 200)}`, res.status), 'agent-auth-start');
       }
@@ -415,14 +415,12 @@ class BuiltWithClient {
   static async agent_auth_token(device_code) {
     _validate_string('device_code', device_code);
     try {
-      const res = await _http_post('https://api.builtwith.com/agent-auth/token', { device_code }, {}, 30000);
-      if (res.status < 200 || res.status >= 300) {
-        return _err(new BuiltWithError('HTTP_ERROR', `HTTP ${res.status}: ${res.body.substring(0, 200)}`, res.status), 'agent-auth-token');
-      }
+      const res = await _http_post('https://api.builtwith.com/agent-auth-token', { device_code }, {}, 30000);
       let data;
       try { data = JSON.parse(res.body); } catch (_) {
         return _err(new BuiltWithError('PARSE_ERROR', 'Failed to parse agent-auth-token response.', res.status), 'agent-auth-token');
       }
+      // Pass through body even on 4xx — error field carries meaningful status (access_denied, expired_token)
       return _ok(data, data, 'agent-auth-token');
     } catch (err) {
       return _err(new BuiltWithError('NETWORK_ERROR', err.message, 0, null, 'Check network connectivity.'), 'agent-auth-token');
