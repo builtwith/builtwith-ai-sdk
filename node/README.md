@@ -63,6 +63,8 @@ if (result.ok) {
 | `payment_discovery()` | — | Agent Payment API: credit balance |
 | `payment_configuration()` | — | Agent Payment API: spending limits |
 | `payment_purchase({ credits })` | Integer ≥ 2000 | Agent Payment API: purchase credits |
+| `BuiltWithClient.agent_auth_start()` | — | Start Device-Code Authorization (static, no key required) |
+| `BuiltWithClient.agent_auth_token(device_code)` | Device code string | Poll for auth result and access token (static, no key required) |
 
 ### Response Format
 
@@ -132,6 +134,8 @@ All methods accept a `CancellationToken` as an optional last parameter.
 | `payment_discovery()` | — | Agent Payment API: credit balance |
 | `payment_configuration()` | — | Agent Payment API: spending limits |
 | `payment_purchase(credits)` | `int` ≥ 2000 | Agent Payment API: purchase credits |
+| `BuiltWithClient.agent_auth_start()` | — | Start Device-Code Authorization (static, no key required) |
+| `BuiltWithClient.agent_auth_token(deviceCode)` | `string` | Poll for auth result and access token (static, no key required) |
 
 ### Response Format
 
@@ -150,6 +154,41 @@ result.Meta     // SdkMeta - request_id, tool, cached
 ```bash
 cd csharp/Examples
 BUILTWITH_API_KEY=your-key dotnet run
+```
+
+---
+
+## Agent Device-Code Authorization
+
+Agents can obtain a temporary `bw-` prefixed API token without the user pasting their key. These are **static methods** — no API key or client instance required.
+
+```js
+// Node.js
+const { BuiltWithClient } = require('@builtwith/sdk');
+
+// Step 1: start the flow
+const start = await BuiltWithClient.agent_auth_start();
+// start.data => { device_code, verification_uri }
+
+console.log(`Open in browser: ${start.data.verification_uri}`);
+
+// Step 2: poll every 5 seconds
+const token = await BuiltWithClient.agent_auth_token(start.data.device_code);
+// token.data => { status: 'pending' | 'approved' | 'denied', access_token? }
+
+if (token.data.status === 'approved') {
+  const client = new BuiltWithClient(token.data.access_token);
+  // use client normally
+}
+```
+
+```csharp
+// C#
+var start = await BuiltWithClient.agent_auth_start();
+// start.Data => { device_code, verification_uri }
+
+var token = await BuiltWithClient.agent_auth_token(deviceCode);
+// token.Data => { status, access_token }
 ```
 
 ---
