@@ -420,7 +420,7 @@ namespace BuiltWith.Sdk
             try
             {
                 using var content = new StringContent("{}", System.Text.Encoding.UTF8, "application/json");
-                using var response = await httpClient.PostAsync("https://api.builtwith.com/agent-auth-start", content, ct).ConfigureAwait(false);
+                using var response = await httpClient.PostAsync("https://api.builtwith.com/agent-auth/start", content, ct).ConfigureAwait(false);
                 var body = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 var status = (int)response.StatusCode;
                 if (status < 200 || status >= 300)
@@ -456,7 +456,7 @@ namespace BuiltWith.Sdk
             {
                 var bodyJson = JsonSerializer.Serialize(new { device_code = deviceCode });
                 using var content = new StringContent(bodyJson, System.Text.Encoding.UTF8, "application/json");
-                using var response = await httpClient.PostAsync("https://api.builtwith.com/agent-auth-token", content, ct).ConfigureAwait(false);
+                using var response = await httpClient.PostAsync("https://api.builtwith.com/agent-auth/token", content, ct).ConfigureAwait(false);
                 var body = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 var status = (int)response.StatusCode;
                 // Pass through body even on 4xx — error field carries meaningful status (access_denied, expired_token)
