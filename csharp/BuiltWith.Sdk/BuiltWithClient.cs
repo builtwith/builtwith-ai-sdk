@@ -265,6 +265,21 @@ namespace BuiltWith.Sdk
             return RequestAsync("domain-api", new { lookup }, ct);
         }
 
+        public Task<SdkResult> change(string lookup, string since = null, CancellationToken ct = default)
+        {
+            ValidateString("lookup", lookup);
+            if (!string.IsNullOrEmpty(since))
+                return RequestAsync("change-api", new { lookup, since }, ct);
+            return RequestAsync("change-api", new { lookup }, ct);
+        }
+
+        public Task<SdkResult> change(string[] lookups, string since = null, CancellationToken ct = default)
+        {
+            if (lookups == null || lookups.Length == 0)
+                throw new BuiltWithException("VALIDATION_ERROR", "At least one lookup domain is required.", 0, "Provide one or more root domains.");
+            return change(string.Join(",", lookups), since, ct);
+        }
+
         public Task<SdkResult> relationships(string lookup, CancellationToken ct = default)
         {
             ValidateDomain(lookup);

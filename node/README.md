@@ -47,6 +47,7 @@ if (result.ok) {
 |---|---|---|
 | `domain_lookup_live({ domain })` | Root domain | Live technology lookup |
 | `domain_lookup({ lookup })` | Root domain | Full domain API data |
+| `change({ lookup, since? })` | Root domain or domain array | Technology additions/removals since a date |
 | `relationships({ lookup })` | Root domain | Related websites |
 | `free_summary({ lookup })` | Root domain | Free category/group counts |
 | `company_to_url({ company })` | Company name | Domains from a company name |

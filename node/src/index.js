@@ -252,6 +252,16 @@ class BuiltWithClient {
     return this._request('domain-api', { lookup });
   }
 
+  async change(params) {
+    const { lookup, since } = params || {};
+    const lookupValue = Array.isArray(lookup) ? lookup.join(',') : lookup;
+    _validate_string('lookup', lookupValue);
+    return this._request('change-api', {
+      lookup: lookupValue,
+      ...(since != null ? { since } : {}),
+    });
+  }
+
   async relationships(params) {
     const { lookup } = params || {};
     _validate_domain(lookup);

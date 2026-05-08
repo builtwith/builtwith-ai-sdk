@@ -144,6 +144,12 @@ async function run_tests() {
     'domain_lookup rejects missing lookup'
   );
 
+  await assert_rejects(
+    () => client.change({}),
+    'VALIDATION_ERROR',
+    'change rejects missing lookup'
+  );
+
   // Missing company for company_to_url
   await assert_rejects(
     () => client.company_to_url({}),

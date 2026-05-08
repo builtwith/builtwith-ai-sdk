@@ -26,7 +26,15 @@ class Program
         else
             Console.WriteLine($"Error: {lookup.Error.Message}");
 
-        // ── Example 3: trust ─────────────────────────────────────────────────
+        // ── Example 3: change ────────────────────────────────────────────────
+        Console.WriteLine("\n--- change ---");
+        var changes = await client.change("spotify.com", "last month");
+        if (changes.Ok)
+            Console.WriteLine($"Changes: {JsonSerializer.Serialize(changes.Data).Substring(0, Math.Min(500, JsonSerializer.Serialize(changes.Data).Length))}");
+        else
+            Console.WriteLine($"Error: {changes.Error.Message}");
+
+        // ── Example 4: trust ─────────────────────────────────────────────────
         Console.WriteLine("\n--- trust ---");
         var trustResult = await client.trust("spotify.com");
         if (trustResult.Ok)
@@ -34,7 +42,7 @@ class Program
         else
             Console.WriteLine($"Error: {trustResult.Error.Message}");
 
-        // ── Example 4: company_to_url ────────────────────────────────────────
+        // ── Example 5: company_to_url ────────────────────────────────────────
         Console.WriteLine("\n--- company_to_url ---");
         var company = await client.company_to_url("Spotify");
         if (company.Ok)
