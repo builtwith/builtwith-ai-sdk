@@ -48,6 +48,7 @@ if (result.ok) {
 | `domain_lookup_live({ domain })` | Root domain | Live technology lookup |
 | `domain_lookup({ lookup })` | Root domain | Full domain API data |
 | `change({ lookup, since? })` | Root domain or domain array | Technology additions/removals since a date |
+| `lists({ tech, otherTechs?, filters? })` | Technology name | Sites using a technology; supports numeric filters such as `REVENUE`, `SPEND`, and `EMPLOYEES` |
 | `relationships({ lookup })` | Root domain | Related websites |
 | `free_summary({ lookup })` | Root domain | Free category/group counts |
 | `company_to_url({ company })` | Company name | Domains from a company name |
@@ -119,6 +120,7 @@ All methods accept a `CancellationToken` as an optional last parameter.
 |---|---|---|
 | `domain_lookup_live(domain)` | `string` | Live technology lookup |
 | `domain_lookup(lookup)` | `string` | Full domain API data |
+| `lists(tech, otherTechs?, offset?, country?, since?, filters?)` | `string` | Sites using a technology; supports numeric filters such as `REVENUE`, `SPEND`, and `EMPLOYEES` |
 | `relationships(lookup)` | `string` | Related websites |
 | `free_summary(lookup)` | `string` | Free category/group counts |
 | `company_to_url(company)` | `string` | Domains from a company name |

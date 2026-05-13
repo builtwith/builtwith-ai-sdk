@@ -262,6 +262,16 @@ class BuiltWithClient {
     });
   }
 
+  async lists(params) {
+    const { tech, filters = {}, ...rest } = params || {};
+    _validate_string('tech', tech);
+    return this._request('lists-api', {
+      tech,
+      ...rest,
+      ...(filters && Object.keys(filters).length ? { filters } : {}),
+    });
+  }
+
   async relationships(params) {
     const { lookup } = params || {};
     _validate_domain(lookup);

@@ -280,6 +280,21 @@ namespace BuiltWith.Sdk
             return change(string.Join(",", lookups), since, ct);
         }
 
+        public Task<SdkResult> lists(string tech, string otherTechs = null, string offset = null, string country = null, string since = null, IDictionary<string, string> filters = null, CancellationToken ct = default)
+        {
+            ValidateString("tech", tech);
+            var arguments = new Dictionary<string, object>
+            {
+                ["tech"] = tech
+            };
+            if (!string.IsNullOrEmpty(otherTechs)) arguments["otherTechs"] = otherTechs;
+            if (!string.IsNullOrEmpty(offset)) arguments["offset"] = offset;
+            if (!string.IsNullOrEmpty(country)) arguments["country"] = country;
+            if (!string.IsNullOrEmpty(since)) arguments["since"] = since;
+            if (filters != null && filters.Count > 0) arguments["filters"] = filters;
+            return RequestAsync("lists-api", arguments, ct);
+        }
+
         public Task<SdkResult> relationships(string lookup, CancellationToken ct = default)
         {
             ValidateDomain(lookup);
