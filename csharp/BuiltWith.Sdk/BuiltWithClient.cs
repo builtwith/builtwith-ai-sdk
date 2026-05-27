@@ -375,6 +375,16 @@ namespace BuiltWith.Sdk
             return RequestAsync("vector-search", new { query }, ct);
         }
 
+        public Task<SdkResult> ask(string query, bool? commit = null, string nextOffset = null, bool? meta = null, CancellationToken ct = default)
+        {
+            ValidateString("query", query);
+            var arguments = new Dictionary<string, object> { ["query"] = query };
+            if (commit.HasValue) arguments["commit"] = commit.Value;
+            if (!string.IsNullOrEmpty(nextOffset)) arguments["nextOffset"] = nextOffset;
+            if (meta.HasValue) arguments["meta"] = meta.Value;
+            return RequestAsync("ask-api", arguments, ct);
+        }
+
         public Task<SdkResult> keyword_search(string keyword, int? limit = null, string? offset = null, CancellationToken ct = default)
         {
             ValidateString("keyword", keyword);

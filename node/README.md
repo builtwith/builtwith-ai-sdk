@@ -62,6 +62,7 @@ if (result.ok) {
 | `financial({ lookup })` | Root domain | Financial data |
 | `social({ lookup })` | Root domain | Social profile related domains |
 | `vector_search({ query, limit? })` | Search query | Semantic technology/category search |
+| `ask({ query, commit?, nextOffset?, meta? })` | Natural language query | Natural language website list lookup; set `commit: true` for a full report (up to 1000 results); paginate with `nextOffset` |
 | `payment_discovery()` | — | Agent Payment API: credit balance |
 | `payment_configuration()` | — | Agent Payment API: spending limits |
 | `payment_purchase({ credits })` | Integer ≥ 2000 | Agent Payment API: purchase credits |

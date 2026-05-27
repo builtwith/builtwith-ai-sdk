@@ -360,6 +360,17 @@ class BuiltWithClient {
     });
   }
 
+  async ask(params) {
+    const { query, commit, nextOffset, meta } = params || {};
+    _validate_string('query', query);
+    return this._request('ask-api', {
+      query,
+      ...(commit != null ? { commit } : {}),
+      ...(nextOffset != null ? { nextOffset } : {}),
+      ...(meta != null ? { meta } : {}),
+    });
+  }
+
   async payment_discovery() {
     return this._request('payment-balance', {});
   }
