@@ -332,28 +332,24 @@ class BuiltWithClient {
     return this._request('trust-api', { lookup });
   }
 
-  async financial(params) {
-    const { lookup } = params || {};
-    _validate_domain(lookup);
-    return this._request('financial-api', { lookup });
+  async whoami() {
+    return this._request('whoami-api', {});
   }
 
-  async social(params) {
-    const { lookup } = params || {};
-    _validate_domain(lookup);
-    return this._request('social-api', { lookup });
+  async usage() {
+    return this._request('usage-api', {});
   }
 
   async vector_search(params) {
     const { query, limit } = params || {};
     _validate_string('query', query);
-    return this._request('vector-search', { query, ...(limit != null ? { limit } : {}) });
+    return this._request('vector-api', { query, ...(limit != null ? { limit } : {}) });
   }
 
   async keyword_search(params) {
     const { keyword, limit, offset } = params || {};
     _validate_string('keyword', keyword);
-    return this._request('keyword-search-api', {
+    return this._request('keywords-search-api', {
       keyword,
       ...(limit != null ? { limit } : {}),
       ...(offset != null ? { offset } : {}),

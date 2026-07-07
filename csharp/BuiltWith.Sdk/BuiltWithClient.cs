@@ -355,24 +355,22 @@ namespace BuiltWith.Sdk
             return RequestAsync("trust-api", new { lookup }, ct);
         }
 
-        public Task<SdkResult> financial(string lookup, CancellationToken ct = default)
+        public Task<SdkResult> whoami(CancellationToken ct = default)
         {
-            ValidateDomain(lookup);
-            return RequestAsync("financial-api", new { lookup }, ct);
+            return RequestAsync("whoami-api", new { }, ct);
         }
 
-        public Task<SdkResult> social(string lookup, CancellationToken ct = default)
+        public Task<SdkResult> usage(CancellationToken ct = default)
         {
-            ValidateDomain(lookup);
-            return RequestAsync("social-api", new { lookup }, ct);
+            return RequestAsync("usage-api", new { }, ct);
         }
 
         public Task<SdkResult> vector_search(string query, int? limit = null, CancellationToken ct = default)
         {
             ValidateString("query", query);
             if (limit.HasValue)
-                return RequestAsync("vector-search", new { query, limit = limit.Value }, ct);
-            return RequestAsync("vector-search", new { query }, ct);
+                return RequestAsync("vector-api", new { query, limit = limit.Value }, ct);
+            return RequestAsync("vector-api", new { query }, ct);
         }
 
         public Task<SdkResult> ask(string query, bool? commit = null, string nextOffset = null, bool? meta = null, CancellationToken ct = default)
@@ -389,12 +387,12 @@ namespace BuiltWith.Sdk
         {
             ValidateString("keyword", keyword);
             if (limit.HasValue && !string.IsNullOrEmpty(offset))
-                return RequestAsync("keyword-search-api", new { keyword, limit = limit.Value, offset }, ct);
+                return RequestAsync("keywords-search-api", new { keyword, limit = limit.Value, offset }, ct);
             if (limit.HasValue)
-                return RequestAsync("keyword-search-api", new { keyword, limit = limit.Value }, ct);
+                return RequestAsync("keywords-search-api", new { keyword, limit = limit.Value }, ct);
             if (!string.IsNullOrEmpty(offset))
-                return RequestAsync("keyword-search-api", new { keyword, offset }, ct);
-            return RequestAsync("keyword-search-api", new { keyword }, ct);
+                return RequestAsync("keywords-search-api", new { keyword, offset }, ct);
+            return RequestAsync("keywords-search-api", new { keyword }, ct);
         }
 
         public Task<SdkResult> payment_discovery(CancellationToken ct = default)

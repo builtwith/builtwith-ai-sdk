@@ -59,8 +59,8 @@ if (result.ok) {
 | `trends({ tech })` | Technology name | Technology trend data |
 | `product_search({ query })` | Search query | Ecommerce product search |
 | `trust({ lookup })` | Root domain | Trust scoring |
-| `financial({ lookup })` | Root domain | Financial data |
-| `social({ lookup })` | Root domain | Social profile related domains |
+| `whoami()` | — | Account limits, credit costs, endpoint inventory (no API credits) |
+| `usage()` | — | Current credit balance (no API credits) |
 | `vector_search({ query, limit? })` | Search query | Semantic technology/category search |
 | `ask({ query, commit?, nextOffset?, meta? })` | Natural language query | Natural language website list lookup (e.g. `"Magento websites in Spain"`); set `commit: true` for a full report (up to 1000 results); paginate with `nextOffset` |
 | `payment_discovery()` | — | Agent Payment API: credit balance |
@@ -131,8 +131,8 @@ All methods accept a `CancellationToken` as an optional last parameter.
 | `trends(tech)` | `string` | Technology trend data |
 | `product_search(query)` | `string` | Ecommerce product search |
 | `trust(lookup)` | `string` | Trust scoring |
-| `financial(lookup)` | `string` | Financial data |
-| `social(lookup)` | `string` | Social profile related domains |
+| `whoami()` | — | Account limits, credit costs, endpoint inventory (no API credits) |
+| `usage()` | — | Current credit balance (no API credits) |
 | `vector_search(query, limit?)` | `string`, `int?` | Semantic technology/category search |
 | `ask(query, commit?, nextOffset?, meta?)` | `string`, `bool?`, `string?`, `bool?` | Natural language website list lookup (e.g. `"Magento websites in Spain"`); set `commit: true` for a full report (up to 1000 results); paginate with `nextOffset` |
 | `payment_discovery()` | — | Agent Payment API: credit balance |
