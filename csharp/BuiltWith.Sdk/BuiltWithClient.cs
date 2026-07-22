@@ -355,6 +355,17 @@ namespace BuiltWith.Sdk
             return RequestAsync("trust-api", new { lookup }, ct);
         }
 
+        public Task<SdkResult> vat(string lookup, CancellationToken ct = default)
+        {
+            ValidateString("lookup", lookup);
+            return RequestAsync("vat-api", new { lookup }, ct);
+        }
+
+        public Task<SdkResult> vat_types(CancellationToken ct = default)
+        {
+            return RequestAsync("vat-types-api", new { }, ct);
+        }
+
         public Task<SdkResult> whoami(CancellationToken ct = default)
         {
             return RequestAsync("whoami-api", new { }, ct);

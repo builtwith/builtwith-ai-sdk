@@ -59,6 +59,8 @@ if (result.ok) {
 | `trends({ tech })` | Technology name | Technology trend data |
 | `product_search({ query })` | Search query | Ecommerce product search |
 | `trust({ lookup })` | Root domain | Trust scoring |
+| `vat({ lookup })` | Root domain(s), comma-separated (1–16) | VAT, GST, and other company registration numbers |
+| `vat_types()` | — | Reference list of registration types (no API key required) |
 | `whoami()` | — | Account limits, credit costs, endpoint inventory (no API credits) |
 | `usage()` | — | Current credit balance (no API credits) |
 | `vector_search({ query, limit? })` | Search query | Semantic technology/category search |
@@ -131,6 +133,8 @@ All methods accept a `CancellationToken` as an optional last parameter.
 | `trends(tech)` | `string` | Technology trend data |
 | `product_search(query)` | `string` | Ecommerce product search |
 | `trust(lookup)` | `string` | Trust scoring |
+| `vat(lookup)` | `string` | VAT, GST, and other company registration numbers |
+| `vat_types()` | — | Reference list of registration types (no API key required) |
 | `whoami()` | — | Account limits, credit costs, endpoint inventory (no API credits) |
 | `usage()` | — | Current credit balance (no API credits) |
 | `vector_search(query, limit?)` | `string`, `int?` | Semantic technology/category search |

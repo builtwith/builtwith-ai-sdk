@@ -332,6 +332,17 @@ class BuiltWithClient {
     return this._request('trust-api', { lookup });
   }
 
+  async vat(params) {
+    const { lookup } = params || {};
+    const lookupValue = Array.isArray(lookup) ? lookup.join(',') : lookup;
+    _validate_string('lookup', lookupValue);
+    return this._request('vat-api', { lookup: lookupValue });
+  }
+
+  async vat_types() {
+    return this._request('vat-types-api', {});
+  }
+
   async whoami() {
     return this._request('whoami-api', {});
   }
