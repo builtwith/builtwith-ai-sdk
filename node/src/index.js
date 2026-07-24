@@ -351,6 +351,15 @@ class BuiltWithClient {
     return this._request('usage-api', {});
   }
 
+  async mcp_registry(params) {
+    const { search, category, offset } = params || {};
+    return this._request('mcp-registry-api', {
+      ...(search != null ? { search } : {}),
+      ...(category != null ? { category } : {}),
+      ...(offset != null ? { offset } : {}),
+    });
+  }
+
   async vector_search(params) {
     const { query, limit } = params || {};
     _validate_string('query', query);

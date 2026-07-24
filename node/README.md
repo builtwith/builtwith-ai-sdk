@@ -63,6 +63,7 @@ if (result.ok) {
 | `vat_types()` | — | Reference list of registration types (no API key required) |
 | `whoami()` | — | Account limits, credit costs, endpoint inventory (no API credits) |
 | `usage()` | — | Current credit balance (no API credits) |
+| `mcp_registry({ search?, category?, offset? })` | — | Search/browse the BuiltWith MCP registry of discovered remote MCP servers (no API credits) |
 | `vector_search({ query, limit? })` | Search query | Semantic technology/category search |
 | `ask({ query, commit?, nextOffset?, meta? })` | Natural language query | Natural language website list lookup; set `commit: true` for a full report (up to 1000 results); paginate with `nextOffset` |
 | `payment_discovery()` | — | Agent Payment API: credit balance |
@@ -138,6 +139,7 @@ All methods accept a `CancellationToken` as an optional last parameter.
 | `vat_types()` | — | Reference list of registration types (no API key required) |
 | `whoami()` | — | Account limits, credit costs, endpoint inventory (no API credits) |
 | `usage()` | — | Current credit balance (no API credits) |
+| `mcp_registry(search?, category?, offset?)` | `string?`, `string?`, `int?` | Search/browse the BuiltWith MCP registry of discovered remote MCP servers (no API credits) |
 | `vector_search(query, limit?)` | `string`, `int?` | Semantic technology/category search |
 | `payment_discovery()` | — | Agent Payment API: credit balance |
 | `payment_configuration()` | — | Agent Payment API: spending limits |
