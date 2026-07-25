@@ -381,6 +381,11 @@ namespace BuiltWith.Sdk
             return RequestAsync("mcp-registry-api", new { search, category, offset }, ct);
         }
 
+        public Task<SdkResult> mcp_registry_v2(string search = null, string category = null, int? offset = null, CancellationToken ct = default)
+        {
+            return RequestAsync("mcp-registry-v2-api", new { search, category, offset }, ct);
+        }
+
         public Task<SdkResult> vector_search(string query, int? limit = null, CancellationToken ct = default)
         {
             ValidateString("query", query);
