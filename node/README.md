@@ -1,5 +1,9 @@
 # BuiltWith AI First SDK
 
+## Domain API v25
+
+Domain lookups now use API v25. Technology records include numeric `confidence` scores from 0 to 1. Full JSON responses include `Meta.company_reg`, an array of company registration records with string `type` and `number` fields; registration numbers preserve leading zeros. The array is empty when unavailable or metadata is excluded. See the [API reference](https://api.builtwith.com/llms.txt). Full domain methods preserve both fields; live technology lookups include `confidence` and return technology records only. The Node.js and .NET SDKs access v25 through the configured MCP server, which must support v25.
+
 Official SDK for the [BuiltWith](https://builtwith.com) MCP API. Available for **Node.js** and **.NET**.
 
 ## API Key
