@@ -295,10 +295,14 @@ namespace BuiltWith.Sdk
             return RequestAsync("lists-api", arguments, ct);
         }
 
-        public Task<SdkResult> relationships(string lookup, CancellationToken ct = default)
+        public Task<SdkResult> relationships(string lookup, CancellationToken ct = default) =>
+            relationships(lookup, 1, false, ct);
+
+        public Task<SdkResult> relationships(string lookup, int page, bool ip = false, CancellationToken ct = default)
         {
             ValidateDomain(lookup);
-            return RequestAsync("relationships-api", new { lookup }, ct);
+            if (page < 1) throw new ArgumentOutOfRangeException(nameof(page));
+            return RequestAsync("relationships-api", new { lookup, page, ip }, ct);
         }
 
         public Task<SdkResult> free_summary(string lookup, CancellationToken ct = default)

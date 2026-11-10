@@ -273,9 +273,10 @@ class BuiltWithClient {
   }
 
   async relationships(params) {
-    const { lookup } = params || {};
+    const { lookup, page, ip } = params || {};
     _validate_domain(lookup);
-    return this._request('relationships-api', { lookup });
+    if (page != null && (!Number.isInteger(page) || page < 1)) throw new Error('page must be a positive integer');
+    return this._request('relationships-api', { lookup, ...(page != null ? { page } : {}), ...(ip != null ? { ip } : {}) });
   }
 
   async free_summary(params) {
